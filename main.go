@@ -7,7 +7,7 @@ import (
 	"os/signal"
 	"time"
 
-	"github.com/loafoe/loki-cf-logdrain/handlers"
+	"github.com/philips-software/loki-cf-logdrain/handlers"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
@@ -126,6 +126,12 @@ func realMain(echoChan chan<- *echo.Echo) int {
 
 	setupPprof()
 	setupInterrupts()
+
+	// RabbitMQ
+	rabbitMQHandler, err := handlers.NewRabbitMQHandler(promtailEndpoint)
+	if err == nil {
+		_, _ = rabbitMQHandler.CreateWorker("log_drainer_exchange", "log_drainer_rk", "loki_queue", "loki")
+	}
 
 	echoChan <- e
 	exitCode := 0

@@ -5,7 +5,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/philips-software/logproxy/handlers"
+	"github.com/philips-software/loki-cf-logdrain/handlers"
 
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"

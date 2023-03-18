@@ -1,11 +1,12 @@
 package handlers_test
 
 import (
+	"context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	"github.com/philips-software/logproxy/handlers"
+	"github.com/philips-software/loki-cf-logdrain/handlers"
 
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
@@ -20,7 +21,7 @@ func TestHealth(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 	healthHandler := &handlers.HealthHandler{}
-	handler := healthHandler.Handler(nil)
+	handler := healthHandler.Handler(context.Background(), nil)
 
 	// Assertions
 	if assert.NoError(t, handler(c)) {

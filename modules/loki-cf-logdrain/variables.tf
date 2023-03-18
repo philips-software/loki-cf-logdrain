@@ -49,5 +49,5 @@ variable "loki_push_endpoint" {
 variable "docker_registry_image" {
   description = "The Docker registry image to use."
   type        = string
-  default     = "loafoe/loki-cf-logdrain"
+  default     = "ghcr.io/philips-software/loki-cf-logdrain"
 }
