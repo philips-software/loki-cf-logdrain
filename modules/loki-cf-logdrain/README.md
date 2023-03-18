@@ -37,7 +37,7 @@ No modules.
 | <a name="input_cf_domain"></a> [cf\_domain](#input\_cf\_domain) | The CF domain to create the route in. | `string` | n/a | yes |
 | <a name="input_cf_space_id"></a> [cf\_space\_id](#input\_cf\_space\_id) | The CF space id to deploy into. | `string` | n/a | yes |
 | <a name="input_disk"></a> [disk](#input\_disk) | The amount of Disk space to allocate for Grafana Loki (MB) | `number` | `1024` | no |
-| <a name="input_docker_registry_image"></a> [docker\_registry\_image](#input\_docker\_registry\_image) | The Docker registry image to use. | `string` | `"loafoe/loki-cf-logdrain"` | no |
+| <a name="input_docker_registry_image"></a> [docker\_registry\_image](#input\_docker\_registry\_image) | The Docker registry image to use. | `string` | `"ghcr.io/philips-software/loki-cf-logdrain"` | no |
 | <a name="input_docker_tag"></a> [docker\_tag](#input\_docker\_tag) | n/a | `string` | `"latest"` | no |
 | <a name="input_loki_password"></a> [loki\_password](#input\_loki\_password) | The Loki password used for basic auth. | `string` | `""` | no |
 | <a name="input_loki_push_endpoint"></a> [loki\_push\_endpoint](#input\_loki\_push\_endpoint) | The Loki push endpoint. This should include /loki/api/v1/push | `string` | n/a | yes |
