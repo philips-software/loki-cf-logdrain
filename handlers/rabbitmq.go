@@ -98,31 +98,16 @@ func (h *RabbitMQHandler) CreateWorker(exchange, exchangeType, routingKey, queue
 
 func (h *RabbitMQHandler) RabbitMQRFC5424Worker(doneChannel <-chan bool) rabbitmq.ConsumerHandlerFunc {
 	return func(deliveries <-chan amqp.Delivery, done <-chan bool) {
-		var rabbitMQMessage RabbitMQMessage
 		for {
 			select {
 			case d := <-deliveries:
 				ackDelivery(d)
-				err := json.Unmarshal(d.Body, &rabbitMQMessage)
-				if err != nil {
-					fmt.Printf("Error parsing RabbitMQ message: %v\n", err)
-					continue
-				}
-				// Construct new syslog
-				body := fmt.Sprintf("<14>1 %s %s %s %s %s %s %s",
-					rabbitMQMessage.Timestamp.Format(time.RFC3339),
-					rabbitMQMessage.LogEvent.ServerName,
-					rabbitMQMessage.LogEvent.ApplicationName,
-					rabbitMQMessage.LogEvent.Id,
-					"-",
-					rabbitMQMessage.Syslog5424Sd,
-					rabbitMQMessage.LogEvent.LogData.Message)
-				_, err = h.parser.Parse([]byte(body))
+				_, err := h.parser.Parse(d.Body)
 				if err != nil {
 					fmt.Printf("Error parsing syslog message: %v\n", err)
 					continue
 				}
-				_, _ = h.writer.Write([]byte(body))
+				_, _ = h.writer.Write(d.Body)
 			case <-done:
 				fmt.Printf("Worker received done message (server)...\n")
 				return
@@ -139,4 +124,23 @@ func ackDelivery(d amqp.Delivery) {
 	if err != nil {
 		fmt.Printf("Error Acking delivery: %v\n", err)
 	}
+}
+
+func parseJSONBody(body []byte) {
+	var rabbitMQMessage RabbitMQMessage
+
+	err := json.Unmarshal(body, &rabbitMQMessage)
+	if err != nil {
+		fmt.Printf("Error parsing RabbitMQ message: %v\n", err)
+		return
+	}
+	// Construct new syslog
+	fmt.Sprintf("<14>1 %s %s %s %s %s %s %s",
+		rabbitMQMessage.Timestamp.Format(time.RFC3339),
+		rabbitMQMessage.LogEvent.ServerName,
+		rabbitMQMessage.LogEvent.ApplicationName,
+		rabbitMQMessage.LogEvent.Id,
+		"-",
+		rabbitMQMessage.Syslog5424Sd,
+		rabbitMQMessage.LogEvent.LogData.Message)
 }
