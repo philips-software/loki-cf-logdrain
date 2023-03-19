@@ -1,8 +1,10 @@
 package handlers
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
+	"time"
 
 	syslog "github.com/RackSec/srslog"
 	v2syslog "github.com/influxdata/go-syslog/v2"
@@ -10,6 +12,38 @@ import (
 	"github.com/loafoe/go-rabbitmq"
 	"github.com/streadway/amqp"
 )
+
+type RabbitMQMessage struct {
+	Syslog5424Sd string    `json:"syslog5424_sd,omitempty"`
+	Type         string    `json:"type"`
+	LogEvent     LogEvent  `json:"LogEvent"`
+	Timestamp    time.Time `json:"@timestamp,omitempty"`
+	Tags         []string  `json:"tags,omitempty"`
+	Version      string    `json:"@version,omitempty"`
+}
+
+type LogData struct {
+	Message string `json:"message"`
+}
+
+type LogEvent struct {
+	LogData             LogData   `json:"logData"`
+	ApplicationName     string    `json:"applicationName"`
+	ServiceName         string    `json:"serviceName"`
+	EventId             string    `json:"eventId"`
+	ServerName          string    `json:"serverName"`
+	OriginatingUser     string    `json:"originatingUser"`
+	Id                  string    `json:"id"`
+	LogTime             time.Time `json:"logTime"`
+	TransactionId       string    `json:"transactionId"`
+	ApplicationVersion  string    `json:"applicationVersion"`
+	ProductName         string    `json:"productName"`
+	Category            string    `json:"category"`
+	ApplicationInstance string    `json:"applicationInstance"`
+	Severity            string    `json:"severity"`
+	Component           string    `json:"component"`
+	ResourceType        string    `json:"resourceType"`
+}
 
 type RabbitMQHandler struct {
 	debug  bool
@@ -64,18 +98,31 @@ func (h *RabbitMQHandler) CreateWorker(exchange, exchangeType, routingKey, queue
 
 func (h *RabbitMQHandler) RabbitMQRFC5424Worker(doneChannel <-chan bool) rabbitmq.ConsumerHandlerFunc {
 	return func(deliveries <-chan amqp.Delivery, done <-chan bool) {
+		var rabbitMQMessage RabbitMQMessage
 		for {
 			select {
 			case d := <-deliveries:
-				// TODO: PARSE message here
 				ackDelivery(d)
-				syslogMessage, err := h.parser.Parse(d.Body)
-				fmt.Printf("version=%d\n", syslogMessage.Version())
+				err := json.Unmarshal(d.Body, &rabbitMQMessage)
 				if err != nil {
-					fmt.Printf("Error processing syslog message: %v\n", err)
+					fmt.Printf("Error parsing RabbitMQ message: %v\n", err)
 					continue
 				}
-				_, _ = h.writer.Write(d.Body)
+				// Construct new syslog
+				body := fmt.Sprintf("<14>1 %s %s %s %s %s %s %s",
+					rabbitMQMessage.Timestamp.Format(time.RFC3339),
+					rabbitMQMessage.LogEvent.ServerName,
+					rabbitMQMessage.LogEvent.ApplicationName,
+					rabbitMQMessage.LogEvent.Id,
+					"-",
+					rabbitMQMessage.Syslog5424Sd,
+					rabbitMQMessage.LogEvent.LogData.Message)
+				_, err = h.parser.Parse([]byte(body))
+				if err != nil {
+					fmt.Printf("Error parsing syslog message: %v\n", err)
+					continue
+				}
+				_, _ = h.writer.Write([]byte(body))
 			case <-done:
 				fmt.Printf("Worker received done message (server)...\n")
 				return
