@@ -40,13 +40,13 @@ func NewRabbitMQHandler(promtailAddr string) (*RabbitMQHandler, error) {
 	return handler, nil
 }
 
-func (h *RabbitMQHandler) CreateWorker(exchange, routingKey, queueName, consumerTag string) (chan bool, error) {
+func (h *RabbitMQHandler) CreateWorker(exchange, exchangeType, routingKey, queueName, consumerTag string) (chan bool, error) {
 	doneChannel := make(chan bool)
 	// Consumer
 	consumer, err := rabbitmq.NewConsumer(rabbitmq.Config{
 		RoutingKey:   routingKey,
 		Exchange:     exchange,
-		ExchangeType: "topic",
+		ExchangeType: exchangeType,
 		Durable:      true,
 		AutoDelete:   false,
 		QueueName:    queueName,

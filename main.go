@@ -132,7 +132,7 @@ func realMain(echoChan chan<- *echo.Echo) int {
 	rabbitMQHandler, err := handlers.NewRabbitMQHandler(promtailEndpoint)
 	if err == nil {
 		fmt.Printf("Creating RabbitMQ worker..\n")
-		_, err = rabbitMQHandler.CreateWorker("log_drainer_exchange", "log_drainer_rk", "loki_queue", "loki")
+		_, err = rabbitMQHandler.CreateWorker("log_drainer_exchange", "direct", "log_drainer_rk", "loki_queue", "loki")
 		if err != nil {
 			fmt.Printf("Error creating RabbitMQ worker: %v\n", err)
 		}
