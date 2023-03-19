@@ -128,9 +128,16 @@ func realMain(echoChan chan<- *echo.Echo) int {
 	setupInterrupts()
 
 	// RabbitMQ
+	fmt.Printf("Looking for RabbitMQ server..\n")
 	rabbitMQHandler, err := handlers.NewRabbitMQHandler(promtailEndpoint)
 	if err == nil {
-		_, _ = rabbitMQHandler.CreateWorker("log_drainer_exchange", "log_drainer_rk", "loki_queue", "loki")
+		fmt.Printf("Creating RabbitMQ worker..\n")
+		_, err = rabbitMQHandler.CreateWorker("log_drainer_exchange", "log_drainer_rk", "loki_queue", "loki")
+		if err != nil {
+			fmt.Printf("Error creating RabbitMQ worker: %v\n", err)
+		}
+	} else {
+		fmt.Printf("No RabbitMQ server found: %v\n", err)
 	}
 
 	echoChan <- e
