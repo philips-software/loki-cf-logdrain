@@ -84,7 +84,12 @@ func (h *RabbitMQHandler) CreateWorker(exchange, exchangeType, routingKey, queue
 		AutoDelete:   false,
 		QueueName:    queueName,
 		CTag:         consumerTag,
-		HandlerFunc:  h.RabbitMQRFC5424Worker(doneChannel),
+		Qos: &rabbitmq.Qos{
+			PrefetchCount: 50,
+			PrefetchSize:  0,
+			Global:        false,
+		},
+		HandlerFunc: h.RabbitMQRFC5424Worker(doneChannel),
 	})
 	if err != nil {
 		return nil, err
