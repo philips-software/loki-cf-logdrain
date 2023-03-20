@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"time"
@@ -124,23 +123,4 @@ func ackDelivery(d amqp.Delivery) {
 	if err != nil {
 		fmt.Printf("Error Acking delivery: %v\n", err)
 	}
-}
-
-func parseJSONBody(body []byte) {
-	var rabbitMQMessage RabbitMQMessage
-
-	err := json.Unmarshal(body, &rabbitMQMessage)
-	if err != nil {
-		fmt.Printf("Error parsing RabbitMQ message: %v\n", err)
-		return
-	}
-	// Construct new syslog
-	fmt.Sprintf("<14>1 %s %s %s %s %s %s %s",
-		rabbitMQMessage.Timestamp.Format(time.RFC3339),
-		rabbitMQMessage.LogEvent.ServerName,
-		rabbitMQMessage.LogEvent.ApplicationName,
-		rabbitMQMessage.LogEvent.Id,
-		"-",
-		rabbitMQMessage.Syslog5424Sd,
-		rabbitMQMessage.LogEvent.LogData.Message)
 }
