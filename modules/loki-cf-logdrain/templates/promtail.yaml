@@ -9,18 +9,32 @@ scrape_configs:
     syslog:
       listen_address: 0.0.0.0:1514
       idle_timeout: 60s
-      label_structured_data: yes
-      use_incoming_timestamp: yes
+      label_structured_data: true
+      use_incoming_timestamp: false
+      max_message_length: 65536
       labels:
-        job: "syslog"
+        job: "loki-cf-logdrain"
+    pipeline_stages:
+      - match:
+          selector: '{job="loki-cf-logdrain"} |= "CustomLogEvent"'
+          stages:
+            - regex:
+                expression: '(?P<severity>[^\|]*)\|CustomLogEvent\|(?P<transaction_id>[^\|]*)\|(?P<component_name>[^\|]*)\|(?P<message>.*)'
+            - template:
+                source: new_key
+                template: '{{ .message }}'
+            - output:
+                source: new_key
     relabel_configs:
+      - source_labels: ['__syslog_message_sd_tags_47450_product_name']
+        target_label: 'product_name'
       - source_labels: ['__syslog_message_hostname']
         target_label: 'host'
-      - source_labels: ['__syslog_message_app_name']
+      - source_labels: ['__syslog_message_sd_tags_47450_app_name']
         target_label: 'app_name'
-      - source_labels: ['__syslog_message_proc_id']
-        target_label: 'proc_id'
-      - source_labels: ['__syslog_message_msg_id']
-        target_label: 'msg_id'
+      - source_labels: [ '__syslog_message_sd_tags_47450_organization_name' ]
+        target_label: 'organization_name'
+      - source_labels: [ '__syslog_message_sd_tags_47450_space_name' ]
+        target_label: 'space_name'
       - source_labels: ['__syslog_message_severity']
         target_label: 'sev'
