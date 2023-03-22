@@ -102,10 +102,17 @@ func (h *RabbitMQHandler) CreateWorker(exchange, exchangeType, routingKey, queue
 
 func (h *RabbitMQHandler) RabbitMQRFC5424Worker(doneChannel <-chan bool) rabbitmq.ConsumerHandlerFunc {
 	return func(deliveries <-chan amqp.Delivery, done <-chan bool) {
+		count := 0
 		for {
 			select {
 			case d := <-deliveries:
 				ackDelivery(d)
+				count++
+				if (count % 100) == 0 {
+					for k, v := range d.Headers {
+						fmt.Printf("Header: %s, Value: %v\n", k, v)
+					}
+				}
 				_, err := h.parser.Parse(d.Body)
 				if err != nil {
 					fmt.Printf("Error parsing syslog message: %v\n", err)
