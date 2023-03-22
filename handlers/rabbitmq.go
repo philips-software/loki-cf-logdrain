@@ -126,8 +126,10 @@ func (h *RabbitMQHandler) RabbitMQRFC5424Worker(doneChannel <-chan bool) rabbitm
 							cfsd["product_name"] = productName.(string)
 							fmt.Printf("organization_name:%v, space_name:%v\n", cfsd["organization_name"], cfsd["space_name"])
 						}
-						fmt.Printf("productName: %s, sd: %+v\n", productName, sd)
-						fmt.Printf("message: %+v\n", msg.Message())
+						rendered := msg.Message()
+						if rendered != nil {
+							fmt.Printf("message: %s\n", *rendered)
+						}
 					}
 				}
 				_, _ = h.writer.Write(d.Body)
