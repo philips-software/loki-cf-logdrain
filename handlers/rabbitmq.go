@@ -106,7 +106,6 @@ func (h *RabbitMQHandler) CreateWorker(exchange, exchangeType, routingKey, queue
 
 func (h *RabbitMQHandler) RabbitMQRFC5424Worker(doneChannel <-chan bool) rabbitmq.ConsumerHandlerFunc {
 	return func(deliveries <-chan amqp.Delivery, done <-chan bool) {
-		count := 0
 		for {
 			select {
 			case d := <-deliveries:
@@ -117,22 +116,30 @@ func (h *RabbitMQHandler) RabbitMQRFC5424Worker(doneChannel <-chan bool) rabbitm
 					fmt.Printf("Error parsing syslog message: %v\n", err)
 					continue
 				}
-				count++
+				mutated := rfc5424.SyslogMessage{}
+				mutated.SetAppname(*msg.Appname())
+				mutated.SetProcID(*msg.ProcID())
+				mutated.SetPriority(*msg.Priority())
+				mutated.SetVersion(msg.Version())
+				mutated.SetHostname(*msg.Hostname())
+				mutated.SetTimestamp(msg.Timestamp().Format(time.RFC3339))
 				// Available keys: product_key, product_name, index_type
-				if productName, ok := d.Headers["product_name"]; ok && msg != nil {
-					if (count % 100) == 0 {
-						sd := msg.StructuredData()
-						if cfsd, ok := (*sd)[tagsStructuredDataID]; ok {
-							cfsd["product_name"] = productName.(string)
-							fmt.Printf("organization_name:%v, space_name:%v\n", cfsd["organization_name"], cfsd["space_name"])
-						}
-						rendered := msg.Message()
-						if rendered != nil {
-							fmt.Printf("message: %s\n", *rendered)
-						}
+				if productName, ok := d.Headers["product_name"]; ok {
+					mutated.SetParameter(tagsStructuredDataID, "product_name", productName.(string))
+				}
+				sd := msg.StructuredData()
+				if cfsd, ok := (*sd)[tagsStructuredDataID]; ok {
+					for k, v := range cfsd {
+						mutated.SetParameter(tagsStructuredDataID, k, v)
 					}
 				}
-				_, _ = h.writer.Write(d.Body)
+				mutated.SetMessage(*msg.Message())
+				output, err := mutated.String()
+				if err != nil {
+					fmt.Printf("Error rendering syslog message: %v\n", err)
+					continue
+				}
+				_, _ = h.writer.Write([]byte(output))
 			case <-done:
 				fmt.Printf("Worker received done message (server)...\n")
 				return
