@@ -50,6 +50,10 @@ type RabbitMQHandler struct {
 	parser v2syslog.Machine
 }
 
+const (
+	tagsStructuredDataID = "tags@47450"
+)
+
 func NewRabbitMQHandler(promtailAddr string) (*RabbitMQHandler, error) {
 	if promtailAddr == "" {
 		return nil, fmt.Errorf("missing promtail address")
@@ -118,8 +122,12 @@ func (h *RabbitMQHandler) RabbitMQRFC5424Worker(doneChannel <-chan bool) rabbitm
 				if productName, ok := d.Headers["product_name"]; ok && msg != nil {
 					if (count % 100) == 0 {
 						sd := msg.StructuredData()
+						if cfsd, ok := (*sd)[tagsStructuredDataID]; ok {
+							cfsd["product_name"] = productName.(string)
+							fmt.Printf("organization_name:%v, space_name:%v\n", cfsd["organization_name"], cfsd["space_name"])
+						}
 						fmt.Printf("productName: %s, sd: %+v\n", productName, sd)
-						fmt.Printf("message: %v\n", msg.Message())
+						fmt.Printf("message: %+v\n", msg.Message())
 					}
 				}
 				_, _ = h.writer.Write(d.Body)
