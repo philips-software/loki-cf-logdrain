@@ -107,16 +107,20 @@ func (h *RabbitMQHandler) RabbitMQRFC5424Worker(doneChannel <-chan bool) rabbitm
 			select {
 			case d := <-deliveries:
 				ackDelivery(d)
-				count++
-				if (count % 100) == 0 {
-					for k, v := range d.Headers {
-						fmt.Printf("Header: %s, Value: %v\n", k, v)
-					}
-				}
-				_, err := h.parser.Parse(d.Body)
+
+				msg, err := h.parser.Parse(d.Body)
 				if err != nil {
 					fmt.Printf("Error parsing syslog message: %v\n", err)
 					continue
+				}
+				count++
+				// Available keys: product_key, product_name, index_type
+				if productName, ok := d.Headers["product_name"]; ok && msg != nil {
+					if (count % 100) == 0 {
+						sd := msg.StructuredData()
+						fmt.Printf("productName: %s, sd: %+v\n", productName, sd)
+						fmt.Printf("message: %v\n", msg.Message())
+					}
 				}
 				_, _ = h.writer.Write(d.Body)
 			case <-done:
