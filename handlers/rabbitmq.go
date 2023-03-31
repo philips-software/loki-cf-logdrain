@@ -116,12 +116,28 @@ func (h *RabbitMQHandler) RabbitMQRFC5424Worker(doneChannel <-chan bool) rabbitm
 					fmt.Printf("Error parsing syslog message: %v\n", err)
 					continue
 				}
+				if msg == nil {
+					fmt.Printf("nil message, skipping\n")
+					continue
+				}
+				hostname := msg.Hostname()
+				appName := msg.Appname()
+				procID := msg.ProcID()
+				priority := msg.Priority()
 				mutated := rfc5424.SyslogMessage{}
-				mutated.SetAppname(*msg.Appname())
-				mutated.SetProcID(*msg.ProcID())
-				mutated.SetPriority(*msg.Priority())
+				if appName != nil {
+					mutated.SetAppname(*appName)
+				}
+				if procID != nil {
+					mutated.SetProcID(*procID)
+				}
+				if priority != nil {
+					mutated.SetPriority(*priority)
+				}
 				mutated.SetVersion(msg.Version())
-				mutated.SetHostname(*msg.Hostname())
+				if hostname != nil {
+					mutated.SetHostname(*hostname)
+				}
 				mutated.SetTimestamp(msg.Timestamp().Format(time.RFC3339))
 				// Available keys: product_key, product_name, index_type
 				if productName, ok := d.Headers["product_name"]; ok {
