@@ -25,6 +25,7 @@ No modules.
 | Name | Type |
 |------|------|
 | [cloudfoundry_app.loki_cf_logdrain](https://registry.terraform.io/providers/cloudfoundry-community/cloudfoundry/latest/docs/resources/app) | resource |
+| [cloudfoundry_network_policy.loki](https://registry.terraform.io/providers/cloudfoundry-community/cloudfoundry/latest/docs/resources/network_policy) | resource |
 | [cloudfoundry_route.loki_cf_logdrain](https://registry.terraform.io/providers/cloudfoundry-community/cloudfoundry/latest/docs/resources/route) | resource |
 | [cloudfoundry_user_provided_service.logdrain](https://registry.terraform.io/providers/cloudfoundry-community/cloudfoundry/latest/docs/resources/user_provided_service) | resource |
 | [random_password.token](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/password) | resource |
@@ -39,6 +40,7 @@ No modules.
 | <a name="input_disk"></a> [disk](#input\_disk) | The amount of Disk space to allocate for Grafana Loki (MB) | `number` | `1024` | no |
 | <a name="input_docker_registry_image"></a> [docker\_registry\_image](#input\_docker\_registry\_image) | The Docker registry image to use. | `string` | `"ghcr.io/philips-software/loki-cf-logdrain"` | no |
 | <a name="input_docker_tag"></a> [docker\_tag](#input\_docker\_tag) | n/a | `string` | `"latest"` | no |
+| <a name="input_loki_network_policy"></a> [loki\_network\_policy](#input\_loki\_network\_policy) | Network policy configuration in case the Loki is running on CF | <pre>object({<br>    app_id = string<br>    port   = string<br>  })</pre> | <pre>{<br>  "app_id": "",<br>  "port": 3100<br>}</pre> | no |
 | <a name="input_loki_password"></a> [loki\_password](#input\_loki\_password) | The Loki password used for basic auth. | `string` | `""` | no |
 | <a name="input_loki_push_endpoint"></a> [loki\_push\_endpoint](#input\_loki\_push\_endpoint) | The Loki push endpoint. This should include /loki/api/v1/push | `string` | n/a | yes |
 | <a name="input_loki_username"></a> [loki\_username](#input\_loki\_username) | The Loki username used for basic auth. Default: loki | `string` | `""` | no |

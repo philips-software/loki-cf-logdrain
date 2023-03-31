@@ -51,3 +51,15 @@ variable "docker_registry_image" {
   type        = string
   default     = "ghcr.io/philips-software/loki-cf-logdrain"
 }
+
+variable "loki_network_policy" {
+  description = "Network policy configuration in case the Loki is running on CF"
+  type = object({
+    app_id = string
+    port   = string
+  })
+  default = {
+    app_id = ""
+    port   = 3100
+  }
+}

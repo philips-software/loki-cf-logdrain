@@ -1,3 +1,7 @@
+locals {
+  create_network_policy = var.loki_network_policy.app_id != ""
+}
+
 resource "random_password" "token" {
   length  = 32
   special = false
@@ -36,4 +40,15 @@ resource "cloudfoundry_user_provided_service" "logdrain" {
   space = var.cf_space_id
   //noinspection HILUnresolvedReference
   syslog_drain_url = "https://${cloudfoundry_route.loki_cf_logdrain.endpoint}/syslog/drain/${random_password.token.result}"
+}
+
+resource "cloudfoundry_network_policy" "loki" {
+  count = local.create_network_policy ? 1 : 0
+
+  policy {
+    source_app      = cloudfoundry_app.loki_cf_logdrain.id
+    destination_app = var.loki_network_policy.app_id
+    protocol        = "tcp"
+    port            = var.loki_network_policy.port
+  }
 }
