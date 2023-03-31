@@ -1,8 +1,10 @@
 client:
   url: ${loki_push_endpoint}
+%{ if username != "" ~}
   basic_auth:
     username: ${username}
     password: ${password}
+%{ endif ~}
 
 scrape_configs:
   - job_name: syslog

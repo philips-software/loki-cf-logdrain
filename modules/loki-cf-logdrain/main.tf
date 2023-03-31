@@ -13,7 +13,7 @@ resource "cloudfoundry_app" "loki_cf_logdrain" {
     TOKEN = random_password.token.result
     PROMTAIL_YAML_BASE64 = base64encode(templatefile("${path.module}/templates/promtail.yaml", {
       loki_push_endpoint = var.loki_push_endpoint
-      username           = "loki"
+      username           = var.loki_username
       password           = var.loki_password
     }))
   }, {})

@@ -38,7 +38,7 @@ variable "loki_password" {
 variable "loki_username" {
   description = "The Loki username used for basic auth. Default: loki"
   type        = string
-  default     = "loki"
+  default     = ""
 }
 
 variable "loki_push_endpoint" {
