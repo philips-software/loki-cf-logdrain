@@ -9,7 +9,7 @@ require (
 	github.com/loafoe/go-rabbitmq v0.6.0
 	github.com/spf13/viper v1.16.0
 	github.com/streadway/amqp v1.0.0
-	github.com/stretchr/testify v1.8.3
+	github.com/stretchr/testify v1.8.4
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.42.0
 	go.opentelemetry.io/otel v1.16.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.16.0
