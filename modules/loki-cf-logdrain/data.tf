@@ -1,3 +1,3 @@
 data "cloudfoundry_domain" "domain" {
-  domain = var.cf_domain
+  name = var.cf_domain
 }
