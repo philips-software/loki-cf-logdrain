@@ -20,12 +20,6 @@ module "loki_logdrain" {
   
   loki_push_endpoint = "https://loki.some-fiesta-cluster.terrakube.com/loki/api/v1/push"
 }
-
-resource "cloudfoundry_user_provided_service" "loki_logdrain" {
-  name  = "tf-loki-logdrain-${var.postfix}"
-  space = var.cf_space_id
-  syslog_drain_url = module.loki_logdrain.logdrain_url
-}
 ```
 
 ### Binding
