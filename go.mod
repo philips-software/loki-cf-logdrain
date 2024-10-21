@@ -7,7 +7,7 @@ toolchain go1.23.2
 require (
 	github.com/RackSec/srslog v0.0.0-20180709174129-a4725f04ec91
 	github.com/influxdata/go-syslog/v2 v2.0.1
-	github.com/labstack/echo/v4 v4.11.4
+	github.com/labstack/echo/v4 v4.12.0
 	github.com/loafoe/go-rabbitmq v0.6.0
 	github.com/spf13/viper v1.18.2
 	github.com/streadway/amqp v1.1.0
