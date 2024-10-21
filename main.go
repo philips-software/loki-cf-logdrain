@@ -49,10 +49,9 @@ func initProvider() (func(context.Context) error, error) {
 
 	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
-	conn, err := grpc.DialContext(ctx, os.Getenv("OTLP_ADDRESS"),
+	conn, err := grpc.NewClient(os.Getenv("OTLP_ADDRESS"),
 		// Note the use of insecure transport here. TLS is recommended in production.
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithBlock(),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create gRPC connection to collector: %w", err)
