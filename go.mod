@@ -15,7 +15,7 @@ require (
 	go.opentelemetry.io/contrib/instrumentation/github.com/labstack/echo/otelecho v0.57.0
 	go.opentelemetry.io/otel v1.32.0
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc v1.31.0
-	go.opentelemetry.io/otel/sdk v1.31.0
+	go.opentelemetry.io/otel/sdk v1.32.0
 	go.opentelemetry.io/otel/trace v1.32.0
 	google.golang.org/grpc v1.68.1
 )
