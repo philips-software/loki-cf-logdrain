@@ -1,3 +1,5 @@
+# DEPRECATED
+
 # loki-cf-logdrain
 
 ![loki-cf-logdrain.excalidraw.svg](resources%2Floki-cf-logdrain.excalidraw.svg)
